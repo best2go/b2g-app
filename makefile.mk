@@ -185,11 +185,11 @@ $(shell echo $(1) | tr '[:lower:]' '[:upper:]')
 endef
 
 .PHONY: init
-init: diagnose .init.ssl .init.dist .readme ## init system
+init: diagnose .init.ssl .init.dist .init.env.dist .readme ## init system
 
 .PHONY: diagnose
 diagnose: ## Diagnoses the system to identify common errors.
-	$(if $(shell tr --version),$(info tr: ok),$(error tr not found))
+	$(if $(shell type tr),$(info tr: ok),$(error tr not found))
 	$(if $(shell git --version),$(info git: ok),$(error git not found))
 	$(if $(shell egrep --version),$(info egrep: ok),$(error egrep not found))
 	$(if $(shell openssl version),$(info openssl: ok),$(warning openssl not found))
@@ -214,6 +214,9 @@ diagnose: ## Diagnoses the system to identify common errors.
 .PHONY: .init.ssl
 .init.ssl:
 	$(warning /** TODO: ssl provision */)
+
+.PHONY: .init.env.dist
+.init.env.dist: $(addprefix  .init., .env.docker.db.local.dist .env.docker.local.dist)
 
 .PHONY: .init.dist
 .init.dist: $(addprefix  .init., $(wildcard *.dist))
