@@ -1,0 +1,4 @@
+set $map_request_id "";
+set $map_request_id "${map_request_id}:${http_forwarded_request_id}";   # += Forwarded-Request-Id
+set $map_request_id "${map_request_id}:${http_x_forwarded_request_id}"; # += X-Forwarded-Request-Id
+set $map_request_id "${map_request_id}:${http_x_request_id}";           # += X-Request-Id

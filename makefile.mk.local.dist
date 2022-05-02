@@ -1,0 +1,43 @@
+#!/usr/bin/make
+
+-include .env.docker.local
+-include .env.docker.db.local
+
+UNAME = $(call lowercase, $(shell uname -s))
+
+dump: ## mysqldump database
+	$(DC_EXEC) db \
+	mysqldump \
+		--add-drop-table \
+		--compress \
+		--skip-lock-tables \
+		--single-transaction \
+		--host=127.0.0.1 \
+		--user=$(MYSQL_USER) \
+		--password=$(MYSQL_PASSWORD) \
+		$(MYSQL_DATABASE) \
+	| gzip --stdout - > ../$(APP).sql.gz
+
+
+#define _MYSQL_USER
+#$(shell $(DC_EXEC) -T db bash -c 'echo $$MYSQL_USER')
+#endef
+#
+#define _MYSQL_PASSWORD
+#$(shell $(DC_EXEC) -T db bash -c 'echo $$MYSQL_PASSWORD')
+#endef
+#
+#define _MYSQL_DATABASE
+#$(shell $(DC_EXEC) -T db bash -c 'echo $$MYSQL_DATABASE')
+#endef
+#
+#mysql mysql-ci: MYSQL_USER     ?= $(call _MYSQL_USER)
+#mysql mysql-ci: MYSQL_PASSWORD ?= $(call _MYSQL_PASSWORD)
+#mysql mysql-ci: MYSQL_DATABASE ?= $(call _MYSQL_DATABASE)
+
+#php-status:
+#	echo $(MYSQL_USER)
+#	echo $(call status_php)
+
+ddd:
+	echo "ccc '$(call lowercase, "BBB Abc")'"

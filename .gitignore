@@ -1,0 +1,13 @@
+/.env.local
+/.env.local.php
+/.env.*.local
+/.bash_history
+/.bashrc.local
+/docker-compose.override.yml
+/docker-compose.*.override.yml
+/config/secrets/prod/prod.decrypt.private.php
+/makefile.*.local
+/*.local
+/public/bundles/
+/var/
+/vendor/

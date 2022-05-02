@@ -1,0 +1,19 @@
+version: "3.4"
+
+services:
+  db:
+    volumes:
+      - ./deployment/include/mysql:/docker-entrypoint-initdb.d:ro
+    env_file:
+      - .env.docker.db.local
+    healthcheck:
+      test: ["CMD", "mysqladmin", "--user=root", "--password=root", "--host=localhost", "ping"]
+      interval: 5s
+      timeout: 20s
+      retries: 10
+    ports:
+      - "3307:3306"
+
+  php:
+    depends_on:
+      - db

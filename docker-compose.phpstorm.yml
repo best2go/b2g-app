@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  php:
+    volumes:
+      - ./:/app
+
+  xphp:
+    volumes:
+      - ./:/app

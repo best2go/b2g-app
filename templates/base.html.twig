@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {# Run `composer require symfony/webpack-encore-bundle`
+           and uncomment the following Encore helpers to start using Symfony UX #}
+        {% block stylesheets %}
+            {#{{ encore_entry_link_tags('app') }}#}
+        {% endblock %}
+
+        {% block javascripts %}
+            {#{{ encore_entry_script_tags('app') }}#}
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+    <hr>
+        <div style="min-height: 300px; text-align: center; margin-top: 2em;">
+            <img src="/images/war-in-ukraine-01.webp" height="300" alt="" style="box-shadow: 5px 5px 10px">
+            <div style="font-size: 75%; color: #707485; margin-top: 0.3em; font-family: Arial, Helvetica, sans-serif;">
+                Победитель конкурса на почтовую марку Русский военный корабль, иди на#уй (Фото:@borisgroh/Instagram)
+            </div>
+        </div>
+    </body>
+</html>

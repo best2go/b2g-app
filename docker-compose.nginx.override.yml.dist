@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+  nginx:
+    extra_hosts:
+      - "${APP}:127.0.0.1"
+      - "${APP}.com:127.0.0.1"
+      - "www.${APP}.com:127.0.0.1"
+    volumes:
+      - code:/app/b2g-app:ro
+      - ./deployment/include/nginx/upstream-docker.conf:/etc/nginx/conf.d/upstream.conf:ro
+      - ./deployment/include/nginx/resolver.conf:/etc/nginx/conf.d/resolver.conf:ro
+      #- ./deployment/include/nginx/00-config.conf:/etc/nginx/conf.d/00-config.conf:ro      # hot-reload config
+      #- ./deployment/include/nginx/b2g-app.conf:/etc/nginx/conf.d/b2g-conf.conf:ro         # hot-reload config
+      #- ./deployment/include/nginx/b2g-app.ssl.conf:/etc/nginx/conf.d/b2g-conf.ssl.conf:ro # ssl config
+      #- ${HOME}/Work/.shared/ssl_params:/etc/nginx/ssl_params:ro
+      #- ${HOME}/Work/.shared/dhparam.pem:/etc/nginx/ssl/dhparam.pem:ro
+      #- ${HOME}/Work/.shared/www.crt:/etc/nginx/ssl/www.crt:ro
+      #- ${HOME}/Work/.shared/www.key:/etc/nginx/ssl/www.key:ro
+    ports:
+      - "443:443"
+    depends_on:
+      - php

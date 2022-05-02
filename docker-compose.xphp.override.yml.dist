@@ -1,0 +1,20 @@
+version: "3.4"
+
+services:
+  xphp:
+    volumes:
+      - code:/app:cached
+      - composer:/var/cache/composer:delegated
+      - xdg_cache_data:/var/cache/xdg:delegated
+    environment:
+      APP_ENV: "dev"
+      APP_DEBUG: "true"
+      # XDEBUG_CONFIG: "remote_enable=1 remote_host=host.docker.internal profiler_enable=0"
+      PHP_IDE_CONFIG: "serverName=${APP}"
+      COMPOSER_MEMORY_LIMIT: "-1"
+      # https://symfony.com/doc/current/reference/configuration/framework.html#ide
+      # CODE_EDITOR: "phpstorm://open?file=%%f&line=%%l&/app/>${PWD}/" # open from WebProfile in IDE
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - php

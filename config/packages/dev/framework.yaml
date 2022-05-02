@@ -1,0 +1,6 @@
+parameters:
+  "env(CODE_EDITOR)": ~
+
+framework:
+  profiler: { only_exceptions: false }
+  ide: '%env(resolve:CODE_EDITOR)%'

@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+  db:
+    image: mariadb:${MYSQL_VERSION:-10.2.32}
+    hostname: db
+    container_name: db
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    healthcheck:
+      test: ["CMD", "mysqladmin", "--user=root", "--password=root", "--host=localhost", "ping"]
+      interval: 5s
+      timeout: 20s
+      retries: 10
+
+volumes:
+  db_data:

@@ -1,0 +1,8 @@
+version: "3.4"
+
+services:
+  php:
+    volumes:
+      - code:/app:cached
+      - composer:/var/cache/composer:delegated
+      - xdg_cache_data:/var/cache/xdg:delegated

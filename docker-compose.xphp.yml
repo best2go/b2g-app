@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  xphp:
+    image: ${REPOSITORY_ID:-local/$APP}:xphp-${COMMIT_ID:-latest}
+    build:
+      context: .
+      dockerfile: dockerfile
+      target: xphp
+    container_name: xphp
+    hostname: xphp
+    restart: unless-stopped

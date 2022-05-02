@@ -1,0 +1,22 @@
+{
+    "name": "best2go/b2g-parameters",
+    "description": ".env on steroid",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Best2Go\\Best2GoParameters\\": "src/"
+        },
+        "files": [
+            "scripts/bootstrap.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Mykola Lavryk",
+            "email": "nick.lavrik@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}

@@ -1,0 +1,70 @@
+# brew install mutagen-io/mutagen/mutagen
+# mutagen project start
+
+# docker images -aq -f "dangling=true" | xargs --no-run-if-empty docker rmi
+# docker volume ls -q -f "dangling=true" | xargs --no-run-if-empty docker volume rm
+
+# Set up the Mutagen service and code volume before creating sessions.
+beforeCreate:
+    - make php.so
+    - make up php
+#    - docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.mutagen.yml up --build --detach php
+#    - docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.mutagen.yml exec php /wait-for-it.sh localhost:9000 --timeout=120
+
+# Set up the main services after creating sessions. At this point, sessions will
+# have been established and code pushed to the shared volume.
+afterCreate:
+    - make build up
+#    - docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.mutagen.yml up --build --detach
+#    - docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.mutagen.yml exec php /wait-for-it.sh localhost:9000 --timeout=120
+
+# Pause services after pausing sessions.
+afterPause:
+    - make stop
+#    - docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.mutagen.yml stop
+
+# Resume services before resume sessions.
+beforeResume:
+    - make start
+
+# Tear down all services and remove the code volume after terminating sessions.
+afterTerminate:
+    - make down
+
+# Define common utility commands.
+commands: # mutagen project run <command>
+    logs: make logs
+
+# Forward local traffic to the web and API servers.
+#forward:
+#    api:
+#        source: "tcp:localhost:8081"
+#        destination: "docker://web-go-mutagen:tcp:api:8081"
+#    web:
+#        source: "tcp:localhost:8080"
+#        destination: "docker://web-go-mutagen:tcp:web:8080"
+
+# Synchronize code to the shared Docker volume via the Mutagen service.
+sync:
+    defaults:
+        mode: two-way-resolved
+        flushOnCreate: true
+#        permissions:
+#            defaultGroup: "20"
+#            defaultOwner: "501"
+#        configurationBeta:
+#            permissions:
+#                defaultOwner: "www-data"
+#                defaultGroup: "www-data"
+        ignore:
+            vcs: true
+
+    code:
+        alpha: "."
+        beta: "docker://b2g-php/app"
+        mode: "two-way-resolved"
+        ignore:
+            paths:
+                - "/deployment"
+                - "/makefile*"
+                #- "/vendor"

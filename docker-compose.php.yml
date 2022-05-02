@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  php:
+    image: ${REPOSITORY_ID:-local/$APP}:php-${COMMIT_ID:-latest}
+    build:
+      context: .
+      dockerfile: dockerfile
+      target: php
+    container_name: php
+    hostname: php
+    restart: unless-stopped

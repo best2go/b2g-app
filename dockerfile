@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:experimental
 # COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose up --detach --build
-ARG PHP=8.1
+ARG BASE_PHP=php:8.1
 
-FROM php:${PHP}-fpm-alpine AS base
+FROM ${BASE_PHP}-fpm-alpine AS base
 
 # Configuration layer
 ARG USER="www-data"
@@ -13,17 +13,21 @@ ARG HOME="/app"
 #ARG APP_DEBUG="false"
 ARG COMPOSER_HOME="/var/cache/composer"
 ARG XDG_CACHE_HOME="/var/cache/xdg"
+ARG COMPOSER_MEMORY_LIMIT="-1"
 
-ENV USER="${USER}" \
-    UID="${UID}" \
+ENV UID="${UID}" \
     GID="${GID}" \
+    USER="${USER}" \
     HOME="${HOME}" \
     COMPOSER_HOME="${COMPOSER_HOME}" \
     XDG_CACHE_HOME="${XDG_CACHE_HOME}" \
     PHP_INI_DIR="/usr/local/etc/php" \
     PHP_FPM_INI_DIR="/usr/local/etc/php-fpm.d"
+
 #    APP_ENV="${APP_ENV}" \
 #    APP_DEBUG="${APP_DEBUG}" \
+
+# PHP_INI_DIR=/usr/local/etc/php (by default)
 
 # Runtime dependencies, will be part of the finite image
 ARG IMAGE_DEPS=" \
@@ -50,7 +54,13 @@ ARG EXTRA_PHP_EXT=" \
         @composer \
     "
 
-COPY deployment/include/php/bin/ /usr/local/bin
+ARG EXTRA_XPHP_EXT="\
+        pcov \
+        xdebug-3.0.4 \
+    "
+
+COPY deployment/include/php/bin/install-php-extensions /usr/local/bin/install-php-extensions
+COPY deployment/include/php/bin/php-fpm-healthcheck /usr/local/bin/php-fpm-healthcheck
 
 RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.8/main' >> /etc/apk/repositories && \
     apk add --update --no-cache ${IMAGE_DEPS} && \
@@ -72,8 +82,8 @@ HEALTHCHECK --interval=1m30s --timeout=30s --start-period=30s --retries=10 \
 # ----------------------------------------------------------------------------------------------------------------------
 FROM base AS composer
 
+# introduce local composer cache ()
 # ARG COMPOSER_HOME="/var/cache/composer"
-ARG COMPOSER_MEMORY_LIMIT="-1"
 
 USER ${USER}
 WORKDIR ${HOME}
@@ -81,16 +91,18 @@ WORKDIR ${HOME}
 RUN mkdir var    && chown --recursive "${USER}:${USER}" var    && \
     mkdir vendor && chown --recursive "${USER}:${USER}" vendor
 
+# TODO: remove b2g-parameters dependency
 COPY --chown="${USER}:${USER}" composer.* ./
+#COPY --chown="${USER}:${USER}" b2g-parameters/  ./
 
 # https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md
 # https://github.com/FernandoMiguel/Buildkit
-#RUN --mount=type=cache,id=composer_home,mode=0777,target=${COMPOSER_HOME},rw ls -la ${COMPOSER_HOME} && sleep 10
-#RUN --mount=type=cache,id=composer_home,mode=0777,target=${COMPOSER_HOME},rw du -sh ${COMPOSER_HOME} && sleep 10
-#RUN --mount=type=cache,id=composer_home,mode=0777,target=${COMPOSER_HOME},rw,sharing=locked \
+# RUN --mount=type=cache,id=composer_home,mode=0777,target=${COMPOSER_HOME},rw ls -la ${COMPOSER_HOME} && sleep 10
+# RUN --mount=type=cache,id=composer_home,mode=0777,target=${COMPOSER_HOME},rw du -sh ${COMPOSER_HOME} && sleep 10
+# RUN --mount=type=cache,id=composer_home,mode=0777,target=${COMPOSER_HOME},rw,sharing=locked \
 #    composer install --no-autoloader --no-scripts --no-interaction --no-ansi --prefer-dist
 
-RUN composer install --no-autoloader --no-scripts --no-interaction --no-ansi --prefer-dist
+RUN composer install --no-autoloader --no-scripts --no-plugins --no-interaction --no-ansi --prefer-dist --ignore-platform-reqs
 
 #RUN echo -n "composer home :" && composer config home && sleep 10
 #RUN --mount=type=cache,id=composer_home,mode=0777,target=${COMPOSER_HOME},rw ls -la ${COMPOSER_HOME} && sleep 10
@@ -121,7 +133,8 @@ RUN COMPOSER_MEMORY_LIMIT=-1 composer dump-autoload --optimize
 RUN php -d memory_limit=-1 bin/console cache:clear -vv --env=prod --no-debug && \
     php -d memory_limit=-1 bin/console cache:clear -vv --env=test --no-debug && \
     php -d memory_limit=-1 bin/console cache:clear -vv --env=dev             && \
-    php -d memory_limit=-1 bin/console assets:install
+    php -d memory_limit=-1 bin/console assets:install -vv && \
+    echo "done."
 
 ARG APP_OTP="app_otp"
 ARG APP_TAG="app_tag"
@@ -135,11 +148,6 @@ CMD ["php"]
 # ----------------------------------------------------------------------------------------------------------------------
 FROM base AS xphp
 
-ARG EXTRA_XPHP_EXT="\
-        pcov \
-        xdebug-3.0.4 \
-"
-
 RUN install-php-extensions ${EXTRA_XPHP_EXT} && \
     rm -f /usr/local/bin/install-php-extensions && \
     mkdir /opt/phpstorm-coverage && chown ${USER} /opt/phpstorm-coverage
@@ -147,7 +155,6 @@ RUN install-php-extensions ${EXTRA_XPHP_EXT} && \
 USER ${USER}
 WORKDIR ${HOME}
 
-COPY wait-for-it.sh                     /wait-for-it.sh
 COPY docker-entrypoint.sh               /docker-entrypoint.sh
 
 COPY deployment/include/php/php-fpm.ini ${PHP_FPM_INI_DIR}/www.conf
@@ -170,9 +177,17 @@ CMD ["xphp"]
 # ----------------------------------------------------------------------------------------------------------------------
 FROM nginx:stable AS nginx
 
+ARG USER="www-data"
+ARG UID="1000"
+ARG GID="1000"
+
+RUN groupmod --gid "${GID}" "${USER}" && \
+    usermod --uid "${UID}" --gid "${GID}" --home "/app/b2g-app/" "${USER}"
+
 COPY deployment/include/nginx/00-config.conf    /etc/nginx/conf.d/00-config.conf
-COPY deployment/include/nginx/x_request_id.conf /etc/nginx/x_request_id.conf
-COPY deployment/include/nginx/b2g-app.conf.conf /etc/nginx/conf.d/b2g-conf.conf
+COPY deployment/include/nginx/x_request_id      /etc/nginx/x_request_id
+COPY deployment/include/nginx/fastcgi_params    /etc/nginx/fastcgi_params
+COPY deployment/include/nginx/b2g-app.conf      /etc/nginx/conf.d/b2g-conf.conf
 COPY deployment/include/nginx/upstream-ecs.conf /etc/nginx/conf.d/upstream.conf
 COPY docker-entrypoint.sh                       /docker-entrypoint.sh
 
@@ -180,5 +195,6 @@ COPY docker-entrypoint.sh                       /docker-entrypoint.sh
 
 COPY --from=php /app/public /app/b2g-app/public
 
+WORKDIR "/app/b2g-app"
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["nginx"]
