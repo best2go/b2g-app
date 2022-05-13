@@ -9,14 +9,14 @@ os: # darwin / linux
 
 .PHONY: composer
 composer:
-	$(DC_EXEC) $(PHP) composer $(COMMAND_ARGS) $(CMD_ARGS)
+	$(COMPOSER) $(COMMAND_ARGS) $(CMD_ARGS)
 
 .PHONY: console
 console: info
-	$(DC_EXEC) $(XPHP) php -f bin/console -- $(COMMAND_ARGS) $(CMD_ARGS)
+	$(XCONSOLE) $(COMMAND_ARGS) $(CMD_ARGS)
 
 .PHONY: exec
-exec: ## make exec ${SERVICE:-xphp} ${COMMAND:-bash} {ARGS...} ${CMD_ARGS} ${DC_ARGS}
+exec: ## make exec ${SERVICE:-xphp} ${COMMAND:-bash} {ARGS...} ${CMD_ARGS}
 	$(DC_EXEC) $(COMMAND_ARGS) $(CMD_ARGS)
 
 .PHONY: prune
@@ -99,6 +99,10 @@ login: ## login in docker registry
 ps: ## show current process list
 	$(DC) ps $(CMD_ARGS)
 
+.PHONY: stats
+stats: ## docker stats
+	$(DOCKER) stats $(CMD_ARGS)
+
 .PHONY: build
 build: info $(DOCKER_IMAGES) ## build docker images (all at once)
 	echo "build $(strip $(DOCKER_IMAGES)) done."
@@ -142,7 +146,7 @@ cache.%.so:
 
 .PHONY: nginx
 nginx: info ## make nginx [reload]
-	$(NGINX) $(COMMAND_ARGS)
+	$(NGINX) $(COMMAND_ARGS) $(CMD_ARGS)
 
 .PHONY: mysql-ci
 mysql-ci: ## echo "show tables" | make mysql-ci

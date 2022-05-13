@@ -151,6 +151,11 @@ ifneq ($(filter $(SWITCH_ON), $(DOCKER_INCLUDE_BLACKFIRE)),)
 	DOCKER_COMPOSE_FILES += $(addprefix -f ,$(wildcard docker-compose.blackfire.override.yml))
 endif
 
+ifneq ($(filter $(SWITCH_ON), $(DOCKER_INCLUDE_CONSUL)),)
+    DOCKER_COMPOSE_FILES += -f docker-compose.consul.yml
+	DOCKER_COMPOSE_FILES += $(addprefix -f ,$(wildcard docker-compose.consul.override.yml))
+endif
+
 ifdef DOCKER_COMPOSE_ADDONS
     DOCKER_COMPOSE_FILES += $(DOCKER_COMPOSE_ADDONS)
 endif
@@ -239,23 +244,23 @@ info:
 	@#echo "MYSQL_USER = $(MYSQL_USER)"
 
 
-## dumb targets
-.PHONY: ngrok
-ngrok:
-	@echo "ngrok command terminator."
-	@true
-
-.PHONY: php
-php:
-	@echo "php command terminator."
-	@true
-
-.PHONY: xphp
-xphp:
-	@echo "xphp command terminator."
-	@true
-
-.PHONY: bash
-bash:
-	@echo "bash command terminator."
-	@true
+## dumb targets - macos dependency
+#.PHONY: ngrok
+#ngrok:
+#	@echo "ngrok command terminator."
+#	@true
+#
+#.PHONY: php
+#php:
+#	@echo "php command terminator."
+#	@true
+#
+#.PHONY: xphp
+#xphp:
+#	@echo "xphp command terminator."
+#	@true
+#
+#.PHONY: bash
+#bash:
+#	@echo "bash command terminator."
+#	@true

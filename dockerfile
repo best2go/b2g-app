@@ -122,7 +122,7 @@ RUN mkdir var    && chown --recursive "${USER}:${USER}" var    && \
 
 COPY docker-entrypoint.sh               /docker-entrypoint.sh
 COPY deployment/include/php/php-fpm.ini ${PHP_FPM_INI_DIR}/www.conf
-COPY deployment/include/php/php.ini     /usr/local/etc/php/conf.d/php.ini
+COPY deployment/include/php/php.ini     ${PHP_INI_DIR}/conf.d/php.ini
 
 COPY --chown="${USER}:${USER}" --from=composer /app/vendor /app/vendor
 COPY --chown="${USER}:${USER}" . .
@@ -158,10 +158,10 @@ WORKDIR ${HOME}
 COPY docker-entrypoint.sh               /docker-entrypoint.sh
 
 COPY deployment/include/php/php-fpm.ini ${PHP_FPM_INI_DIR}/www.conf
-COPY deployment/include/php/xdebug.ini  /usr/local/etc/php/conf.d/xdebug.ini
-COPY deployment/include/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
-COPY deployment/include/php/php.ini     /usr/local/etc/php/conf.d/php.ini
-COPY deployment/include/php/xphp.ini    /usr/local/etc/php/conf.d/xphp.ini
+COPY deployment/include/php/xdebug.ini  ${PHP_INI_DIR}/conf.d/xdebug.ini
+COPY deployment/include/php/opcache.ini ${PHP_INI_DIR}/conf.d/opcache.ini
+COPY deployment/include/php/php.ini     ${PHP_INI_DIR}/conf.d/php.ini
+COPY deployment/include/php/xphp.ini    ${PHP_INI_DIR}/conf.d/xphp.ini
 
 COPY --from=php /app /app
 

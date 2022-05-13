@@ -2,4 +2,18 @@
 
 {% block body %}
     <h1 style="text-align: center;">Hello {{ name ?: 'Anonymous' }}!</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+    {% for env in app.request.server|filter(v => v is not iterable)|keys|sort %}
+        <tr>
+            <th style="text-align: left">{{ env }}</th>
+            <td>{{ app.request.server.get(env) }}</td>
+        </tr>
+    {% endfor %}
+    </table>
 {% endblock %}
