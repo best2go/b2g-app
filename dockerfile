@@ -50,6 +50,7 @@ ARG EXTRA_PHP_EXT=" \
         gd \
         iconv \
         imagick \
+        intl \
         ssh2-1.3 \
         @composer \
     "
@@ -124,10 +125,11 @@ COPY docker-entrypoint.sh               /docker-entrypoint.sh
 COPY deployment/include/php/php-fpm.ini ${PHP_FPM_INI_DIR}/www.conf
 COPY deployment/include/php/php.ini     ${PHP_INI_DIR}/conf.d/php.ini
 
-COPY --chown="${USER}:${USER}" --from=composer /app/vendor /app/vendor
+COPY --chown="${USER}:${USER}" --from=composer /app/vendor ${HOME}/vendor
 COPY --chown="${USER}:${USER}" . .
 
 RUN COMPOSER_MEMORY_LIMIT=-1 composer dump-autoload --optimize
+#RUN COMPOSER_MEMORY_LIMIT=-1 composer dump-autoload
 
 #RUN SHELL_VERBOSITY=2 COMPOSER_MEMORY_LIMIT=-1 composer run-script symfony-scripts --no-interaction --no-ansi
 RUN php -d memory_limit=-1 bin/console cache:clear -vv --env=prod --no-debug && \

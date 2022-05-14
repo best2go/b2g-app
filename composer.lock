@@ -4,40 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7080a104967d1450297aa3bbf3c18218",
+    "content-hash": "9a3964495dcf126092223b62fb04f0e9",
     "packages": [
-        {
-            "name": "best2go/b2g-parameters",
-            "version": "dev-main",
-            "dist": {
-                "type": "path",
-                "url": "b2g-parameters",
-                "reference": "3fc2cac9e4bc4afc39157efe31f8d99f60cdb84c"
-            },
-            "type": "symfony-bundle",
-            "autoload": {
-                "psr-4": {
-                    "Best2Go\\Best2GoParameters\\": "src/"
-                },
-                "files": [
-                    "scripts/bootstrap.php"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Mykola Lavryk",
-                    "email": "nick.lavrik@gmail.com"
-                }
-            ],
-            "description": ".env on steroid",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
         {
             "name": "doctrine/annotations",
             "version": "1.13.2",
@@ -4891,9 +4859,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "best2go/b2g-parameters": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

@@ -1,7 +1,4 @@
 {
-    "best2go/b2g-parameters": {
-        "version": "dev-main"
-    },
     "doctrine/annotations": {
         "version": "1.13",
         "recipe": {
